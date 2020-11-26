@@ -1,0 +1,43 @@
+.root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  position: relative;
+}
+.background {
+  top: 0;
+  margintop: 0;
+  paddingtop: 0;
+  hight: "100%";
+  width: "100%";
+  position: "fixed";
+}
+
+.content {
+  position: fixed;
+  margin-left: 25%;
+  margin-top: 10%;
+  width: 30%;
+  height: 50%;
+  background: #fce4b0;
+  opacity: 0.8;
+  color: #f1f1f1;
+}
+.mydiv {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  width: 25em;
+  height: 25em;
+  margin-top: -9em; /*set to a negative number 1/2 of your height*/
+  margin-left: -15em; /*set to a negative number 1/2 of your width*/
+  border: 1px solid #ccc;
+  background-color: #fce4b0;
+  opacity: 0.85;
+  border-radius: 25px;
+}
+.child {
+  margin: 5% 38%;
+  width: 100px;
+}
