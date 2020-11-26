@@ -2,7 +2,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 8px;
+  /* padding: 8px; */
   position: relative;
 }
 .background {
@@ -26,16 +26,17 @@
 }
 .mydiv {
   position: fixed;
-  top: 40%;
-  left: 50%;
-  width: 25em;
-  height: 25em;
+  top: 35%;
+  left: 45%;
+  width: 35em;
+  height: 18em;
   margin-top: -9em; /*set to a negative number 1/2 of your height*/
   margin-left: -15em; /*set to a negative number 1/2 of your width*/
   border: 1px solid #ccc;
-  background-color: #fce4b0;
-  opacity: 0.85;
-  border-radius: 25px;
+  background-color: #fff1b9;
+  opacity: 1;
+  border-radius: 80px;
+  padding: 40px;
 }
 .child {
   margin: 5% 38%;

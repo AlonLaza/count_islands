@@ -1,9 +1,10 @@
 .root {
   flex: 1;
-  margin: 40px;
   position: relative;
+  height: 90vh;
 }
 .row {
   display: flex;
   justify-content: space-between;
+  height: 8vh;
 }

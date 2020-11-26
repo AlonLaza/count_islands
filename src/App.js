@@ -1,93 +1,57 @@
-import React, {useCallback, useEffect,useRef, useReducer, useState} from 'react';
-
+import React, {useState,useCallback } from 'react';
 import styles from './App.module.css';
-import useInterval from "@use-it/interval";
-import Header from './Header';
-import Maze from './Maze';
-import Board from './Board';
-import seaVideo from './seaVideo.mp4';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link
-  } from "react-router-dom";
+import {useHistory } from "react-router-dom";
+import Background from './images/islandImage.jpg';
 
 
 function App() {
 
- 
-    const [showBoard, setShowBoard] = useState(false);
-    const [randomize, setRandomize] = useState(undefined);
+    const history = useHistory();
 
-    const showRandomizeBoard = ()=>{
-        setRandomize(true);
-        const cols = parseInt(document.getElementById("cols").value);
-        const rows = parseInt(document.getElementById("rows").value);
-        if(cols<1 || rows<1){
-            alert('false');
-            return;
+    const checkInput = ()=>{
+        const rows = parseInt(document.getElementById("input_rows").value);
+        const cols = parseInt(document.getElementById("input_cols").value);
+        if(isNaN(rows) || isNaN(cols) || cols<1 || rows<1){
+            return false;
         }
-        setShowBoard(true);
+        else{
+            return {rows:rows,cols:cols};
+        }
     }
 
-    const showBlankBoard = ()=>{
-        setRandomize(false);
-        const cols = parseInt(document.getElementById("cols").value);
-        const rows = parseInt(document.getElementById("rows").value);
-        if(cols<1 || rows<1){
-            alert('false');
+    const showBoard = ({randomize})=>{
+        let ans = checkInput();
+        if(!ans){
+            alert('Invalid Input, Please Enter Integers')
             return;
         }
-        setShowBoard(true);
+         history.push({pathname: "/board",
+                       state: { randomize: randomize, rows:ans.rows, cols:ans.cols}});
     }
-
     
     return (
         <div className={styles.root}>
-              
-           {!showBoard &&<video style={{marginTop:0,paddingTop:0,hight:'100%',width:'100%',position:'fixed'}}/*className={styles.background}*/ autoPlay loop muted>
-                <source src={seaVideo} type='video/mp4' />
-            </video>}
-           
-            
-            {!showBoard && 
-            (<div className={styles.mydiv}>
-                <h4 style={{marginTop:20, fontSize:18,textAlign:'center',color: 'black'}}>Please Enter Bitmap Size</h4>
-                <div style={{paddingLeft:'15%' }}> 
-                    <input id="cols"  type="number" style={{width:'35%', textAlign:'center'}} placeholder='rows'></input>
-                    <text style={{color:'black',marginLeft:'5%',marginRight:'5%'}}>X</text>
-                    <input id="rows"  type="number"  style={{width:'35%', textAlign:'center'}} placeholder='cols'></input>
-                </div>
-                {/* <form>
-  <div class="form-row">
-    <div class="col">
-      <input type="text" class="form-control" placeholder="First name"/>
-    </div>
-    <div class="col">
-      <input type="text" class="form-control" placeholder="Last name"/>
-    </div>
-  </div>
-</form> */}
-
-
-                
-                <div style={{marginTop:'10%', flex:'10%',justifyContent: 'space-between'}}>
-                    <button style={{marginLeft:'18%'}} type="button" class="btn btn-primary" onClick={showRandomizeBoard} >Randomize</button>
-                    <button type="button" style={{marginLeft:'5%'}} class="btn btn-primary" onClick={showBlankBoard} >Bonus Draw</button>
-                </div>
-            </div>)}
-
-            {showBoard &&<Board
-             randomize={randomize}
-            />}
+           <section style={{flex:1,backgroundImage: `url(${Background})`} }>            
+            </section>    
+            <div className={styles.mydiv}>
+                <h4 style={{marginTop:20,textAlign:'center',color: 'black'}}>Please Enter Bitmap Size</h4>
+                <form style={{marginTop:'5%',marginLeft:'25%'}}>
+                    <div class="form-row align-items-center">
+                        <div class="col-sm-4">
+                        <input style={{color:'black'}} type="number" class="form-control" id="input_rows" placeholder="Rows"/>
+                        </div>
+                        <div class="col-sm-4">
+                        <input type="number" class="form-control" id="input_cols" placeholder="Cols"/>
+                        </div>
+                    </div>
+                    <div style={{marginTop:'5%', flex:'10%',justifyContent: 'space-between'}}>
+                            <button type="button" class="btn btn-primary" onClick={()=>{showBoard({randomize:true});}} >Randomize</button>
+                            <button type="button" style={{marginLeft:'5%'}} class="btn btn-primary" onClick={()=>{showBoard({randomize:false});}} >Bonus Draw</button>
+                    </div>               
+                </form>  
+            </div>
         </div>
-
     );
-
 }
-
-
-
 
 export default App;

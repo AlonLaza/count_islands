@@ -2,16 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './Board.module.css';
 import Maze from './Maze';
 import CountIslands from './CountIslands';
+import {useLocation} from "react-router-dom";
 
 
-function Board({  randomize }) {
+function Board() {
     const canvas = useRef(null);
     const container = useRef(null);
     const [ctx, setCtx] = useState(undefined);
     const [maze, setMaze] = useState(new Maze(17, 33));
     const [count, setCount] = useState(0);
     const [buttonText, setbuttonText] = useState("Solve");
-
+    const [randomize] = useState(useLocation().state.randomize);
+    console.log('board',useLocation().state.rows);
 
     const block = useRef({});
 
@@ -159,6 +161,7 @@ const handleEvent = (event) => {
             <canvas ref={canvas} onMouseDown={ handleEvent } />
            
         </div>
+        
     );
 }
 
