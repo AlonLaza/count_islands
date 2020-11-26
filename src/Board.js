@@ -2,19 +2,20 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './Board.module.css';
 import Maze from './Maze';
 import CountIslands from './CountIslands';
-import {useLocation} from "react-router-dom";
+import {useLocation, useHistory} from "react-router-dom";
+import distinctColors from 'distinct-colors'
 
 
 function Board() {
+    const {rows, cols} = useLocation().state;
     const canvas = useRef(null);
     const container = useRef(null);
     const [ctx, setCtx] = useState(undefined);
-    const [maze, setMaze] = useState(new Maze(17, 33));
+    const [maze, setMaze] = useState(new Maze(rows, cols));
     const [count, setCount] = useState(0);
-    const [buttonText, setbuttonText] = useState("Solve");
-    const [randomize] = useState(useLocation().state.randomize);
-    console.log('board',useLocation().state.rows);
-
+    const [solveButPress, setSolveButPress] = useState(false);
+    const [randomize,setRandomize] = useState(useLocation().state.randomize);
+    const history = useHistory();
     const block = useRef({});
 
     useEffect(() => {
@@ -48,7 +49,7 @@ const handleEvent = (event) => {
         const gridTop = rect.top;
         const col = Math.floor((event.pageX - gridLeft) / block.current.blockWidth    );
         const row= Math.floor((event.pageY - gridTop) / block.current.blockHeight    );
-        if(col < 0 || col >32){
+        if(col < 0 || col >maze.cols){
             return;
         }
         setMaze(maze => {
@@ -86,17 +87,18 @@ const handleEvent = (event) => {
             }
             ctx.fillStyle = 'blue';
             ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);
-
-            const blockWidth = Math.floor(canvas.current.width / maze.cols);
-            const blockHeight = Math.floor(canvas.current.height / maze.rows);
-            const xOffset = Math.floor((canvas.current.width - maze.cols * blockWidth) / 2);
-            let colors = [];
+             let colors = [];
             // while (colors.length < count) {
             //     do {
             //         var color = Math.floor((Math.random()*1000000)+1);
             //     } while (colors.indexOf(color) >= 0);
             //     colors.push("#" + ("000000" + color.toString(16)).slice(-6));
             // }
+            console.log('count',count);
+            let palette = distinctColors({count: count});
+            console.log(palette);
+            console.log(palette[0]);
+
             for(let i=0;i<count;i++){
                 colors.push("#" + ((1 << 24) * Math.random() | 0).toString(16));
             }
@@ -107,16 +109,14 @@ const handleEvent = (event) => {
                         drawLine(blockWidth * (x + 1) + xOffset, blockHeight * y, 0, blockHeight);
                         drawLine(blockWidth * x + xOffset, blockHeight * (y + 1), blockWidth, 0);
                         drawLine(blockWidth * x + xOffset, blockHeight * y, 0, blockHeight);
-                        if(x==0 && y==0){
-                            console.log('here',maze.grid[0]);
-                        }
                         if(cell){
                             if(count==0){
                                 ctx.fillStyle='brown';  
                             }
                             else{
-                                console.log(colors[cell-1]);
-                                ctx.fillStyle = colors[cell-1];
+                                //ctx.fillStyle = colors[cell-1];
+                                ctx.fillStyle = palette[cell-1];
+
                             }
                             ctx.fillRect(blockWidth * x + xOffset, blockHeight * y, blockWidth, blockHeight);   
                         }
@@ -134,34 +134,33 @@ const handleEvent = (event) => {
         setMaze(maze => {
             return { ...maze,grid: numOfIslands[1] }
           }); 
-          setbuttonText("Restart");
+          setSolveButPress(true);
+          setRandomize(true);   
+          
+    }
+
+    const restart = () => {
+        history.push("/"); 
     }
 
     return (
-        <div
-            className={styles.root}
-            ref={container}
-        >
-           <header>
-            <div className={styles.row}>
-                <p>Count Islands!</p>
-                <button onClick={solve}>{buttonText}</button>
-                <p>Number Of Islands <span className={-1}>{-1}</span></p>
-            </div>
-                
-            {/* <p>
-                1UP <span className={styles.score}>{points.toString().padStart(5, ' ')}</span>&nbsp;&nbsp;
-                ROUND <span className={styles.score}>{round.toString().padStart(3, ' ')}</span>&nbsp;&nbsp;
-                TIME <span className={styles.score}>{formatTime()}</span>
-                
-            </p> */}
-            
-        </header>
-
-            <canvas ref={canvas} onMouseDown={ handleEvent } />
-           
-        </div>
-        
+        <div className={styles.root} ref={container}>
+            <header>
+                <div className={styles.row}>
+                    {!solveButPress && (
+                        <div class="container">
+                            <button type="button" class="btn btn-primary btn-lg mt-2" onClick={solve}>Solve</button>
+                        </div>
+                    )}
+                    {solveButPress && (
+                    <div class="container row">
+                        <h1>Found {count} Islands</h1>
+                        <button type="button" class="btn btn-primary btn-lg h-75 mt-2 ml-5" onClick={restart}>Restart</button>
+                    </div>)}
+                </div>     
+            </header>
+            <canvas ref={canvas} onMouseDown={ handleEvent } /> 
+        </div>   
     );
 }
 

@@ -5,6 +5,9 @@
 }
 .row {
   display: flex;
+  /* background-color: #031d2e; */
   justify-content: space-between;
+  margin-left: 30%;
   height: 8vh;
+  align-content: center;
 }

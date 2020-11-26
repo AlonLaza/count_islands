@@ -31,7 +31,8 @@ function App() {
     
     return (
         <div className={styles.root}>
-           <section style={{flex:1,backgroundImage: `url(${Background})`} }>            
+           <section style={{  backgroundRepeat: 'no-repeat',
+ /*backgroundRepeat: 'no-repeat',*/ flex:1,backgroundImage: `url(${Background})`} }>            
             </section>    
             <div className={styles.mydiv}>
                 <h4 style={{marginTop:20,textAlign:'center',color: 'black'}}>Please Enter Bitmap Size</h4>
