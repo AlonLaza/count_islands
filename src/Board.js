@@ -19,9 +19,8 @@ function Board() {
     const block = useRef({});
 
     useEffect(() => {
-
         const fitToContainer = () => {
-            const { offsetWidth, offsetHeight, left } = container.current;
+            const { offsetWidth, offsetHeight } = container.current;
             canvas.current.width = offsetWidth;
             canvas.current.height = offsetHeight;
             canvas.current.style.width = offsetWidth + 'px';
@@ -30,30 +29,32 @@ function Board() {
 
         setCtx(canvas.current.getContext('2d'));
         fitToContainer();
-
+        block.current.blockWidth = Math.floor(canvas.current.width / grid.cols);
+        block.current.blockHeight = Math.floor(canvas.current.height / grid.rows);
+        block.current.xOffset = Math.floor((canvas.current.width - grid.cols * block.current.blockWidth) / 2);
+        
         if(randomize){
             for (let y = 0; y < grid.rows; y++) {
                 for (let x = 0; x < grid.cols; x++) {
-                    grid.cells[x + y * grid.cols]= (Math.floor(Math.random()*2));
+                    grid.cells[x + y * grid.cols]= (Math.floor(Math.random()*2)? true : false);
                 }
             }
         }
     }, []);
 
 
-const handleEvent = (event) => {
-    
+const handleEvent = (event) => {    
     if (!randomize && event.type === "mousedown") {
-        const  rect =  canvas.current.getBoundingClientRect();
-        const gridLeft = rect.left + block.current.xOffset;
-        const gridTop = rect.top;
-        const col = Math.floor((event.pageX - gridLeft) / block.current.blockWidth    );
-        const row= Math.floor((event.pageY - gridTop) / block.current.blockHeight    );
-        if(col < 0 || col >grid.cols){
+        const  rect =  canvas.current.getBoundingClientRect(); //canvas rectengle
+        const gridLeft = rect.left + block.current.xOffset; //canvas horizontal start
+        const gridTop = rect.top; //canvas vertical start
+        const col = Math.floor((event.pageX - gridLeft) / block.current.blockWidth);
+        const row= Math.floor((event.pageY - gridTop) / block.current.blockHeight);
+        if(col < 0 || col >= grid.cols || row<0 || row>=grid.rows){
             return;
         }
         setGrid(grid => {
-            return { ...grid, cells:grid.cells.map((x,i)=>{
+            return { ...grid, cells: grid.cells.map((x,i)=>{
                 if(i===col+row*grid.cols){
                    return !x; 
                 }
@@ -66,11 +67,7 @@ const handleEvent = (event) => {
    }
 
     useEffect(() => {
-        
 
-        block.current.blockWidth = Math.floor(canvas.current.width / grid.cols);
-        block.current.blockHeight = Math.floor(canvas.current.height / grid.rows);
-        block.current.xOffset = Math.floor((canvas.current.width - grid.cols * block.current.blockWidth) / 2);
         const {blockWidth, blockHeight, xOffset} = block.current;
 
         const drawLine = (x1, y1, width, height) => {
@@ -85,16 +82,10 @@ const handleEvent = (event) => {
             if (!ctx) {
                 return;
             }
-            ctx.fillStyle = '#0879a6';
+            ctx.fillStyle = '#0879a6'; //sea color
             ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);
-             let colors = [];
-            let palette = distinctColors({count: count});
-            console.log(palette);
-            console.log(palette[0]);
+            let palette = distinctColors({count: count}); //creating number of colors as number of found islands
 
-            for(let i=0;i<count;i++){
-                colors.push("#" + ((1 << 24) * Math.random() | 0).toString(16));
-            }
             for (let y = 0; y < grid.rows; y++) {
                 for (let x = 0; x < grid.cols; x++) {
                     const cell = grid.cells[x + y * grid.cols];
@@ -104,11 +95,10 @@ const handleEvent = (event) => {
                         drawLine(blockWidth * x + xOffset, blockHeight * y, 0, blockHeight);
                         if(cell){
                             if(count==0){
-                                ctx.fillStyle='#ECB78B';  
+                                ctx.fillStyle='#ECB78B'; //land color
                             }
                             else{
-                                ctx.fillStyle = palette[cell-1];
-
+                                ctx.fillStyle = palette[cell-1]; //island color
                             }
                             ctx.fillRect(blockWidth * x + xOffset, blockHeight * y, blockWidth, blockHeight);   
                         }
@@ -118,16 +108,16 @@ const handleEvent = (event) => {
         };
 
         draw();
-    }, [ctx, grid,randomize]);
+    }, [ctx, grid]);
 
     const solve = () => {
-        let numOfIslands = new CountIslands(grid.cells,grid.rows,grid.cols).findIslands();
-        setCount(numOfIslands[0]);
+        let numOfIslandsRes = new CountIslands(grid.cells,grid.rows,grid.cols).findIslands();
+        setCount(numOfIslandsRes.count);
         setGrid(grid => {
-            return { ...grid,cells: numOfIslands[1] }
+            return { ...grid,cells: numOfIslandsRes.cells }
           }); 
           setSolveButPress(true);
-          setRandomize(true);   
+          setRandomize(true); //disabling cells drawing
           
     }
 

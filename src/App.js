@@ -1,7 +1,6 @@
-import React, {useState,useCallback } from 'react';
+import React from 'react';
 import styles from './App.module.css';
 import {useHistory } from "react-router-dom";
-import Background from './images/islandImage.jpg';
 
 
 function App() {
