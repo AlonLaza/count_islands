@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Board.module.css';
-import Maze from './Maze';
+import Grid from './Grid';
 import CountIslands from './CountIslands';
 import {useLocation, useHistory} from "react-router-dom";
 import distinctColors from 'distinct-colors'
@@ -11,7 +11,7 @@ function Board() {
     const canvas = useRef(null);
     const container = useRef(null);
     const [ctx, setCtx] = useState(undefined);
-    const [maze, setMaze] = useState(new Maze(rows, cols));
+    const [grid, setGrid] = useState(new Grid(rows, cols));
     const [count, setCount] = useState(0);
     const [solveButPress, setSolveButPress] = useState(false);
     const [randomize,setRandomize] = useState(useLocation().state.randomize);
@@ -32,9 +32,9 @@ function Board() {
         fitToContainer();
 
         if(randomize){
-            for (let y = 0; y < maze.rows; y++) {
-                for (let x = 0; x < maze.cols; x++) {
-                    maze.grid[x + y * maze.cols]= (Math.floor(Math.random()*2));
+            for (let y = 0; y < grid.rows; y++) {
+                for (let x = 0; x < grid.cols; x++) {
+                    grid.cells[x + y * grid.cols]= (Math.floor(Math.random()*2));
                 }
             }
         }
@@ -49,12 +49,12 @@ const handleEvent = (event) => {
         const gridTop = rect.top;
         const col = Math.floor((event.pageX - gridLeft) / block.current.blockWidth    );
         const row= Math.floor((event.pageY - gridTop) / block.current.blockHeight    );
-        if(col < 0 || col >maze.cols){
+        if(col < 0 || col >grid.cols){
             return;
         }
-        setMaze(maze => {
-            return { ...maze, grid:maze.grid.map((x,i)=>{
-                if(i===col+row*maze.cols){
+        setGrid(grid => {
+            return { ...grid, cells:grid.cells.map((x,i)=>{
+                if(i===col+row*grid.cols){
                    return !x; 
                 }
                 else{
@@ -68,9 +68,9 @@ const handleEvent = (event) => {
     useEffect(() => {
         
 
-        block.current.blockWidth = Math.floor(canvas.current.width / maze.cols);
-        block.current.blockHeight = Math.floor(canvas.current.height / maze.rows);
-        block.current.xOffset = Math.floor((canvas.current.width - maze.cols * block.current.blockWidth) / 2);
+        block.current.blockWidth = Math.floor(canvas.current.width / grid.cols);
+        block.current.blockHeight = Math.floor(canvas.current.height / grid.rows);
+        block.current.xOffset = Math.floor((canvas.current.width - grid.cols * block.current.blockWidth) / 2);
         const {blockWidth, blockHeight, xOffset} = block.current;
 
         const drawLine = (x1, y1, width, height) => {
@@ -85,16 +85,9 @@ const handleEvent = (event) => {
             if (!ctx) {
                 return;
             }
-            ctx.fillStyle = 'blue';
+            ctx.fillStyle = '#0879a6';
             ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);
              let colors = [];
-            // while (colors.length < count) {
-            //     do {
-            //         var color = Math.floor((Math.random()*1000000)+1);
-            //     } while (colors.indexOf(color) >= 0);
-            //     colors.push("#" + ("000000" + color.toString(16)).slice(-6));
-            // }
-            console.log('count',count);
             let palette = distinctColors({count: count});
             console.log(palette);
             console.log(palette[0]);
@@ -102,19 +95,18 @@ const handleEvent = (event) => {
             for(let i=0;i<count;i++){
                 colors.push("#" + ((1 << 24) * Math.random() | 0).toString(16));
             }
-            for (let y = 0; y < maze.rows; y++) {
-                for (let x = 0; x < maze.cols; x++) {
-                    const cell = maze.grid[x + y * maze.cols];
+            for (let y = 0; y < grid.rows; y++) {
+                for (let x = 0; x < grid.cols; x++) {
+                    const cell = grid.cells[x + y * grid.cols];
                         drawLine(blockWidth * x + xOffset, blockHeight * y, blockWidth, 0)
                         drawLine(blockWidth * (x + 1) + xOffset, blockHeight * y, 0, blockHeight);
                         drawLine(blockWidth * x + xOffset, blockHeight * (y + 1), blockWidth, 0);
                         drawLine(blockWidth * x + xOffset, blockHeight * y, 0, blockHeight);
                         if(cell){
                             if(count==0){
-                                ctx.fillStyle='brown';  
+                                ctx.fillStyle='#ECB78B';  
                             }
                             else{
-                                //ctx.fillStyle = colors[cell-1];
                                 ctx.fillStyle = palette[cell-1];
 
                             }
@@ -126,13 +118,13 @@ const handleEvent = (event) => {
         };
 
         draw();
-    }, [ctx, maze,randomize]);
+    }, [ctx, grid,randomize]);
 
     const solve = () => {
-        let numOfIslands = new CountIslands(maze.grid,maze.rows,maze.cols).findIslands();
+        let numOfIslands = new CountIslands(grid.cells,grid.rows,grid.cols).findIslands();
         setCount(numOfIslands[0]);
-        setMaze(maze => {
-            return { ...maze,grid: numOfIslands[1] }
+        setGrid(grid => {
+            return { ...grid,cells: numOfIslands[1] }
           }); 
           setSolveButPress(true);
           setRandomize(true);   
@@ -149,13 +141,13 @@ const handleEvent = (event) => {
                 <div className={styles.row}>
                     {!solveButPress && (
                         <div class="container">
-                            <button type="button" class="btn btn-primary btn-lg mt-2" onClick={solve}>Solve</button>
+                            <button type="button" class="btn btn-primary btn-m mt-1 mb-1" onClick={solve}>Solve</button>
                         </div>
                     )}
                     {solveButPress && (
-                    <div class="container row">
-                        <h1>Found {count} Islands</h1>
-                        <button type="button" class="btn btn-primary btn-lg h-75 mt-2 ml-5" onClick={restart}>Restart</button>
+                    <div class="row">
+                        <h4 class="mt-2">Found {count} Islands</h4>
+                        <button type="button" class="btn btn-primary btn-m mt-1 mb-1 ml-5" onClick={restart}>Restart</button>
                     </div>)}
                 </div>     
             </header>

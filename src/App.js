@@ -30,24 +30,21 @@ function App() {
     }
     
     return (
-        <div className={styles.root}>
-           <section style={{  backgroundRepeat: 'no-repeat',
- /*backgroundRepeat: 'no-repeat',*/ flex:1,backgroundImage: `url(${Background})`} }>            
-            </section>    
+        <div>
             <div className={styles.mydiv}>
-                <h4 style={{marginTop:20,textAlign:'center',color: 'black'}}>Please Enter Bitmap Size</h4>
-                <form style={{marginTop:'5%',marginLeft:'25%'}}>
+                <h4 className={styles.h4}>Please Enter Bitmap Size</h4>
+                <form className={styles.form}>
                     <div class="form-row align-items-center">
                         <div class="col-sm-4">
-                        <input style={{color:'black'}} type="number" class="form-control" id="input_rows" placeholder="Rows"/>
+                            <input type="number" class="form-control" id="input_rows" placeholder="Rows"/>
                         </div>
                         <div class="col-sm-4">
-                        <input type="number" class="form-control" id="input_cols" placeholder="Cols"/>
+                            <input type="number" class="form-control" id="input_cols" placeholder="Cols"/>
                         </div>
                     </div>
-                    <div style={{marginTop:'5%', flex:'10%',justifyContent: 'space-between'}}>
+                    <div class="mt-3">
                             <button type="button" class="btn btn-primary" onClick={()=>{showBoard({randomize:true});}} >Randomize</button>
-                            <button type="button" style={{marginLeft:'5%'}} class="btn btn-primary" onClick={()=>{showBoard({randomize:false});}} >Bonus Draw</button>
+                            <button type="button"class="btn btn-primary ml-3" onClick={()=>{showBoard({randomize:false});}} >Bonus Draw</button>
                     </div>               
                 </form>  
             </div>

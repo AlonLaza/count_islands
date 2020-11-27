@@ -1,10 +1,3 @@
-.root {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  /* padding: 8px; */
-  position: relative;
-}
 .background {
   top: 0;
   margintop: 0;
@@ -14,16 +7,6 @@
   position: "fixed";
 }
 
-.content {
-  position: fixed;
-  margin-left: 25%;
-  margin-top: 10%;
-  width: 30%;
-  height: 50%;
-  background: #fce4b0;
-  opacity: 0.8;
-  color: #f1f1f1;
-}
 .mydiv {
   position: fixed;
   top: 35%;
@@ -38,7 +21,13 @@
   border-radius: 80px;
   padding: 40px;
 }
-.child {
-  margin: 5% 38%;
-  width: 100px;
+
+.h4 {
+  margin-top: 20;
+  text-align: center;
+  color: black;
+}
+.form {
+  margin-top: 5%;
+  margin-left: 25%;
 }

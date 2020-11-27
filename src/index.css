@@ -1,18 +1,12 @@
 /*noinspection CssInvalidAtRule*/
 @import-normalize;
 
-@font-face {
-  font-family: "Joystix";
-  src: local("Joystix"),
-    url("./fonts/joystix/joystix monospace.ttf") format("truetype");
-}
-
 * {
   box-sizing: border-box;
 }
 
 body {
-  background-color: black;
+  background-color: #0879a6;
   color: white;
   margin: 0;
   padding: 0;
