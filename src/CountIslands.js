@@ -30,13 +30,34 @@ class CountIslands {
         }
     }
 
+    bfsSearch = (y, x) => {
+        this.cells[x + y * this.cols] = this.count; //each count is mapped to distinct color
+        let queue = [];
+        queue.push({currX:x, currY:y});  
+
+        while(queue.length>0){
+            let {currX, currY} = queue.shift();
+            for (let i = -1; i <= 1; ++i) {
+                for (let j = -1; j <= 1; ++j) {
+                    let isSafeCell = this.canEnterCell(currY+i, currX+j);                                   
+                    if (isSafeCell) {
+                        this.cells[currX+j + ((currY+i) * this.cols)] = this.count;
+                        queue.push({currX:currX+j, currY:currY+i});
+                    }
+                }
+            }
+        }
+    }
+
 
     findIslands = ()=>{
        for (let y = 0; y < this.rows; y++) {
             for (let x = 0; x < this.cols; x++) {
-                if (this.cells[x + y *this.cols]===true) { //is land and yet visited
+                if (this.cells[x + y *this.cols]===true) {
+                    //is land and yet visited
                     this.count++;
-                    this.expandSearch(y, x);
+                    //this.expandSearch(y, x);
+                    this.bfsSearch(y,x);
                 }
             }
         }
