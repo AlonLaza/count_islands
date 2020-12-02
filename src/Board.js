@@ -10,6 +10,7 @@ function Board() {
     const {rows, cols} = useLocation().state;
     const canvas = useRef(null);
     const container = useRef(null);
+
     const [ctx, setCtx] = useState(undefined);
     const [grid, setGrid] = useState(new Grid(rows, cols));
     const [count, setCount] = useState(0);
@@ -20,19 +21,28 @@ function Board() {
 
     useEffect(() => {
         const fitToContainer = () => {
+            
             const { offsetWidth, offsetHeight } = container.current;
+
             canvas.current.width = offsetWidth;
+            if(grid.cols>100){
+                canvas.current.width *= grid.cols/100;
+            }
+
             canvas.current.height = offsetHeight;
-            canvas.current.style.width = offsetWidth + 'px';
-            canvas.current.style.height = offsetHeight + 'px';
+            if(grid.rows>100){
+                canvas.current.height *= grid.rows/100;
+            }
+            canvas.current.style.width =  canvas.current.width + 'px';
+            canvas.current.style.height = canvas.current.height + 'px';
         };
 
-        setCtx(canvas.current.getContext('2d'));
+       
         fitToContainer();
-        block.current.blockWidth = Math.floor(canvas.current.width / grid.cols);
-        block.current.blockHeight = Math.floor(canvas.current.height / grid.rows);
-        block.current.xOffset = Math.floor((canvas.current.width - grid.cols * block.current.blockWidth) / 2);
-        
+        setCtx(canvas.current.getContext('2d'));
+        block.current.blockWidth = canvas.current.width / grid.cols;
+        block.current.blockHeight = canvas.current.height / grid.rows;
+
         if(randomize){
             for (let y = 0; y < grid.rows; y++) {
                 for (let x = 0; x < grid.cols; x++) {
@@ -46,13 +56,19 @@ function Board() {
 const handleEvent = (event) => {    
     if (!randomize && event.type === "mousedown") {
         const  rect =  canvas.current.getBoundingClientRect(); //canvas rectengle
-        const gridLeft = rect.left + block.current.xOffset; //canvas horizontal start
+        const gridLeft = rect.left; //canvas horizontal start
         const gridTop = rect.top; //canvas vertical start
         const col = Math.floor((event.pageX - gridLeft) / block.current.blockWidth);
         const row= Math.floor((event.pageY - gridTop) / block.current.blockHeight);
         if(col < 0 || col >= grid.cols || row<0 || row>=grid.rows){
             return;
         }
+        const {blockWidth, blockHeight} = block.current;
+       /* ctx.fillStyle = 'brown';
+        ctx.fillRect(blockWidth * col, blockHeight * row, blockWidth, blockHeight);   
+        */
+
+
         setGrid(grid => {
             return { ...grid, cells: grid.cells.map((x,i)=>{
                 if(i===col+row*grid.cols){
@@ -68,7 +84,7 @@ const handleEvent = (event) => {
 
     useEffect(() => {
 
-        const {blockWidth, blockHeight, xOffset} = block.current;
+        const {blockWidth, blockHeight} = block.current;
 
         const drawLine = (x1, y1, width, height) => {
             ctx.strokeStyle = 'white';
@@ -89,10 +105,10 @@ const handleEvent = (event) => {
             for (let y = 0; y < grid.rows; y++) {
                 for (let x = 0; x < grid.cols; x++) {
                     const cell = grid.cells[x + y * grid.cols];
-                        drawLine(blockWidth * x + xOffset, blockHeight * y, blockWidth, 0)
-                        drawLine(blockWidth * (x + 1) + xOffset, blockHeight * y, 0, blockHeight);
-                        drawLine(blockWidth * x + xOffset, blockHeight * (y + 1), blockWidth, 0);
-                        drawLine(blockWidth * x + xOffset, blockHeight * y, 0, blockHeight);
+                        drawLine(blockWidth * x, blockHeight * y, blockWidth, 0)
+                        drawLine(blockWidth * (x + 1), blockHeight * y, 0, blockHeight);
+                        drawLine(blockWidth * x , blockHeight * (y + 1), blockWidth, 0);
+                        drawLine(blockWidth * x , blockHeight * y, 0, blockHeight);
                         if(cell){
                             if(count==0){
                                 ctx.fillStyle='#ECB78B'; //land color
@@ -100,22 +116,24 @@ const handleEvent = (event) => {
                             else{
                                 ctx.fillStyle = palette[cell-1]; //island color
                             }
-                            ctx.fillRect(blockWidth * x + xOffset, blockHeight * y, blockWidth, blockHeight);   
+                            ctx.fillRect(blockWidth * x, blockHeight * y, blockWidth, blockHeight);   
                         }
                 }
             }
-
         };
-
         draw();
+        
+
     }, [ctx, grid]);
 
     const solve = () => {
         let numOfIslandsRes = new CountIslands(grid.cells,grid.rows,grid.cols).findIslands();
         setCount(numOfIslandsRes.count);
+
         setGrid(grid => {
             return { ...grid,cells: numOfIslandsRes.cells }
           }); 
+
           setSolveButPress(true);
           setRandomize(true); //disabling cells drawing
           
@@ -127,8 +145,8 @@ const handleEvent = (event) => {
 
     return (
         <div className={styles.root} ref={container}>
-            <header>
-                <div className={styles.row}>
+            <header className={styles.row}>
+                <div style={{marginLeft:50}}>
                     {!solveButPress && (
                         <div class="container">
                             <button type="button" class="btn btn-primary btn-m mt-1 mb-1" onClick={solve}>Solve</button>
@@ -141,7 +159,7 @@ const handleEvent = (event) => {
                     </div>)}
                 </div>     
             </header>
-            <canvas ref={canvas} onMouseDown={ handleEvent } /> 
+            <canvas style={{marginTop:'8vh'}} ref={canvas} onMouseDown={ handleEvent } /> 
         </div>   
     );
 }
