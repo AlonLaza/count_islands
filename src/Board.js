@@ -13,6 +13,7 @@ function Board() {
 
     const [ctx, setCtx] = useState(undefined);
     const [grid, setGrid] = useState(new Grid(rows, cols));
+    const tempManualCells = useRef(grid.cells);
     const [count, setCount] = useState(0);
     const [solveButPress, setSolveButPress] = useState(false);
     const [randomize,setRandomize] = useState(useLocation().state.randomize);
@@ -64,12 +65,18 @@ const handleEvent = (event) => {
             return;
         }
         const {blockWidth, blockHeight} = block.current;
-       /* ctx.fillStyle = 'brown';
+        ctx.fillStyle = '#ECB78B';
         ctx.fillRect(blockWidth * col, blockHeight * row, blockWidth, blockHeight);   
-        */
+        tempManualCells.current = tempManualCells.current.map((x,i)=>{
+        if(i===col+row*grid.cols){
+           return !x; 
+        }
+        else{
+            return x;
+        }
+     } );
 
-
-        setGrid(grid => {
+    /*    setGrid(grid => {
             return { ...grid, cells: grid.cells.map((x,i)=>{
                 if(i===col+row*grid.cols){
                    return !x; 
@@ -78,7 +85,7 @@ const handleEvent = (event) => {
                     return x;
                 }
             }) }
-          });  
+          });  */
        } 
    }
 
@@ -127,7 +134,10 @@ const handleEvent = (event) => {
     }, [ctx, grid]);
 
     const solve = () => {
-        let numOfIslandsRes = new CountIslands(grid.cells,grid.rows,grid.cols).findIslands();
+
+
+        let numOfIslandsRes = new CountIslands(randomize ? grid.cells : tempManualCells.current
+            ,grid.rows,grid.cols).findIslands();
         setCount(numOfIslandsRes.count);
 
         setGrid(grid => {
